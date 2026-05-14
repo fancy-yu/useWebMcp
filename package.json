@@ -1,0 +1,40 @@
+{
+  "name": "use-web-mcp",
+  "version": "0.0.1",
+  "type": "module",
+  "description": "WebMcp React Context and Hook library",
+  "main": "dist/use-web-mcp.umd.js",
+  "module": "dist/use-web-mcp.es.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "peerDependencies": {
+    "react": ">=16.8.0"
+  },
+  "devDependencies": {
+    "@mcp-b/webmcp-types": "^2.3.2",
+    "@types/node": "^25.7.0",
+    "@types/react": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.0",
+    "react": "^18.3.0",
+    "terser": "^5.47.1",
+    "typescript": "^5.5.0",
+    "vite": "^5.4.0",
+    "vite-plugin-dts": "^4.0.0"
+  },
+  "keywords": [
+    "react",
+    "context",
+    "hook",
+    "typescript",
+    "vite"
+  ],
+  "license": "MIT",
+  "sideEffects": false
+}
