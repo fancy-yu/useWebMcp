@@ -1,5 +1,5 @@
 {
-  "name": "use-web-mcp",
+  "name": "@tencent/use-web-mcp",
   "version": "0.0.1",
   "type": "module",
   "description": "WebMcp React Context and Hook library",
