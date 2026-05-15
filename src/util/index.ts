@@ -1,4 +1,4 @@
-/// <reference types="@mcp-b/webmcp-types" />
+import type{ ModelContext, ToolDescriptor } from "@mcp-b/webmcp-types";
 
 function isModelContextAvailable(): boolean {
   if (typeof navigator === 'undefined') {
@@ -6,63 +6,17 @@ function isModelContextAvailable(): boolean {
   }
   return !!navigator.modelContext;
 }
-/**
- * JSON Schema property definition.
- *
- * @see {@link https://json-schema.org/}
- */
-export interface InputSchemaProperty {
-  /**
-   * JSON Schema type for this property.
-   */
-  type?: string;
 
-  /**
-   * Human-readable description of the property.
-   */
-  description?: string;
-
-  /**
-   * Additional JSON Schema keywords.
-   */
-  [key: string]: unknown;
+export type ExecuteParams = Parameters<ToolDescriptor['execute']>
+export type WebMcpParams<T = Record<string, any>> = Parameters<ModelContext['registerTool']>['0'] & {
+  execute: (data?: T, ...args: ExecuteParams) => ReturnType<ToolDescriptor['execute']>;
 }
-
-/**
- * JSON Schema definition for tool input parameters.
- *
- * @see {@link https://json-schema.org/}
- */
-export interface InputSchema {
-  /**
-   * JSON Schema type for the root value (usually `'object'` for tool args).
-   */
-  type?: string;
-
-  /**
-   * Property definitions for object schemas.
-   */
-  properties?: Record<string, InputSchemaProperty>;
-
-  /**
-   * List of required property names.
-   */
-  required?: readonly string[];
-
-  /**
-   * Additional JSON Schema keywords.
-   */
-  [key: string]: unknown;
-}
-
-export type WebMcpParams = Parameters<Navigator['modelContext']['registerTool']>['0'];
 /**
  * WebMcp 主类
  * 封装 navigator.modelContext 操作
  */
 export class WebMcp {
   webmcpAvaliable: boolean;
-  private modelContext: Navigator['modelContext'] | undefined = navigator.modelContext;
   private mcpMap = new Map<string, WebMcpParams & { controller: AbortController }>();
 
   constructor() {
@@ -72,10 +26,12 @@ export class WebMcp {
     const { name } = params;
     if (!this.webmcpAvaliable) return;
     const mcp = this.mcpMap.get(name);
-    if (mcp) return;
+    if (mcp) {
+      return;
+    }
     try {
       const abortController = new AbortController();
-      this.modelContext?.registerTool?.(params, {
+      (navigator?.modelContext?.registerTool as any)?.(params, {
         signal: abortController.signal,
       });
       this.mcpMap.set(name, {
@@ -90,8 +46,11 @@ export class WebMcp {
   unregister = (name: string) => {
     if (!this.webmcpAvaliable) return;
     try {
-      this.mcpMap.get(name)?.controller?.abort();
-      this.mcpMap.delete(name);
+      const target = this.mcpMap.get(name);
+      if (target?.controller) {
+        target.controller.abort();
+        this.mcpMap.delete(name);
+      }
     } catch (error) {
       console.error(`Failed to unregister MCP tool ${name}:`, error);
     }
